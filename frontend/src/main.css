@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* có thể dùng @aplly để dùng class được định nghĩa trên tailwind */
+/* thêm thuộc tính chung vào @layer base */
+@layer base {
+  html {
+    @apply text-base;
+  }
+  body {
+    @apply font-primary;
+    @apply relative z-1 bg-whiten text-base font-normal text-body;
+  }
+  :root {
+  }
+}
+
+/* thêm nhiều thuộc tính phức tạp cho component*/
+@layer components {
+}
+
+/* thêm những thuộc tính ngoại lệ, không bao gồm trong tailwind */
+@layer utilities {
+}
