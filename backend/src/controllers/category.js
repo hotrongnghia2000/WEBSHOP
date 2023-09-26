@@ -33,7 +33,7 @@ exports.delete = async (req, res) => {
 
 exports.deleteChecks = async (req, res) => {
   const query = req.query;
-  const resDB = await Category.deleteMany({ _id: query.checkBrands });
+  const resDB = await Category.deleteMany({ _id: query.checkCategories });
   return res.status(200).json({
     status: 'SUCCESS',
     data: resDB,
@@ -43,6 +43,16 @@ exports.deleteChecks = async (req, res) => {
 exports.getAll = async (req, res) => {
   // populate sẽ tham chiếu thuộc tính nằm trong table Category, và đó là thuộc tính categories
   const resDB = await Category.find().populate('brands');
+  return res.status(200).json({
+    status: 'SUCCESS',
+    data: resDB,
+  });
+};
+
+exports.getOne = async (req, res) => {
+  // populate sẽ tham chiếu thuộc tính nằm trong table Category, và đó là thuộc tính categories
+  const params = req.params;
+  const resDB = await Category.findById(params.id).populate('brands');
   return res.status(200).json({
     status: 'SUCCESS',
     data: resDB,

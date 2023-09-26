@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import brandApi from "../../../apis/brand";
 import Breadcrumb from "../../../components/Breadcrumb";
@@ -8,8 +9,8 @@ import Button from "../../../components/Button";
 import InputField from "../../../components/InputField";
 import icons from "../../../icons";
 function Brands() {
-  // const [options, setOptions] = React.useState([]);
   const formRef = useRef();
+  const navigate = useNavigate();
   const [brands, setBrands] = React.useState([]);
   const [isCheckAll, setIsCheckAll] = React.useState(false);
   const [checkBrands, setCheckBrands] = React.useState([]);
@@ -115,6 +116,7 @@ function Brands() {
         .catch((err) => console.log(err));
     })();
   }, []);
+
   //
   React.useEffect(() => {
     if (brands.length > 0) {
@@ -212,7 +214,13 @@ function Brands() {
                     </td>
                     <td className="p-4">
                       <div className="whitespace-nowrap text-gray-400">
-                        <button className="mr-2">
+                        <button
+                          className="mr-2"
+                          type="button"
+                          onClick={() => {
+                            navigate(`../ecomerce/brands-edit/${el._id}`);
+                          }}
+                        >
                           <icons.IconBxsEdit className="text-xl" />
                         </button>
                         <button

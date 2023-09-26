@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import categoryApi from "../../../apis/category";
 import Breadcrumb from "../../../components/Breadcrumb";
@@ -8,11 +9,11 @@ import Button from "../../../components/Button";
 import InputField from "../../../components/InputField";
 import icons from "../../../icons";
 function Categories() {
-  // const [options, setOptions] = React.useState([]);
   const formRef = useRef();
-  const [brands, setBrands] = React.useState([]);
+  const navigate = useNavigate();
+  const [categories, setCategories] = React.useState([]);
   const [isCheckAll, setIsCheckAll] = React.useState(false);
-  const [checkBrands, setCheckBrands] = React.useState([]);
+  const [checkCategories, setCheckCategories] = React.useState([]);
   const {
     register,
     handleSubmit,
@@ -24,6 +25,7 @@ function Categories() {
     mode: "onSubmit",
   });
   const onSubmitDeleteCheck = async (data) => {
+    console.log(data);
     Swal.fire({
       title: "Bạn có chắc muốn xóa ?",
       text: "Bạn sẽ không thể khôi phục lại điều này",
@@ -37,10 +39,12 @@ function Categories() {
       if (result.isConfirmed) {
         await categoryApi
           .deleteChecks(data)
-          .then(() => {
-            setBrands((prev) =>
-              prev.filter((el) => !data.checkBrands.includes(el._id)),
+          .then((res) => {
+            console.log(res);
+            setCategories((prev) =>
+              prev.filter((el) => !data.checkCategories.includes(el._id)),
             );
+            setCheckCategories([]);
             Swal.fire(
               `Bạn đã xóa thành công`,
               `Các mục bạn chọn đã được xóa`,
@@ -55,26 +59,27 @@ function Categories() {
   // function
   const handleCheckAll = (e) => {
     setIsCheckAll(e.target.checked);
-    setCheckBrands(brands.map((el) => el._id));
+    setCheckCategories(categories.map((el) => el._id));
     setValue(
-      "checkBrands",
-      brands.map((el) => el._id),
+      "checkCategories",
+      categories.map((el) => el._id),
     );
     if (isCheckAll) {
-      setCheckBrands([]);
-      setValue("checkBrands", []);
+      setCheckCategories([]);
+      setValue("checkCategories", []);
     }
   };
   const handleCheck = (e) => {
     // giá sử ta truyền cho input một checked = false, vậy khi ta click nó sẽ trả về một !checked, tức giá trị true
     // tuy nhiên, nếu giá trị truyền cho input không thay đổi, thì khi ta click lần nữa vẫn nhận giá trị true như lần trước đó
     const { value, checked } = e.target;
-    setCheckBrands((prev) => [...prev, value]);
-    if (!checked) setCheckBrands(checkBrands.filter((el) => el !== value));
+    setCheckCategories((prev) => [...prev, value]);
+    if (!checked)
+      setCheckCategories(checkCategories.filter((el) => el !== value));
   };
 
   //
-  const deleteBrand = async (id) => {
+  const deleteCategory = async (id) => {
     Swal.fire({
       title: "Bạn có chắc muốn xóa ?",
       text: "Bạn sẽ không thể khôi phục lại điều này",
@@ -89,7 +94,8 @@ function Categories() {
         await categoryApi
           .delete(id)
           .then((res) => {
-            setBrands((prev) => prev.filter((el) => el._id !== id));
+            setCategories((prev) => prev.filter((el) => el._id !== id));
+
             Swal.fire(
               `Bạn đã xóa thành công`,
               `<strong>${res.data.data.name}</strong> đã được xóa`,
@@ -109,17 +115,17 @@ function Categories() {
         .getAll()
         .then((res) => {
           const data = res.data.data;
-          setBrands(data);
+          setCategories(data);
         })
         .catch((err) => console.log(err));
     })();
   }, []);
   //
   React.useEffect(() => {
-    if (brands.length > 0)
-      if (brands.length === checkBrands.length) setIsCheckAll(true);
+    if (categories.length > 0)
+      if (categories.length === checkCategories.length) setIsCheckAll(true);
       else setIsCheckAll(false);
-  }, [checkBrands]);
+  }, [checkCategories]);
   return (
     <div>
       <Breadcrumb pageName="Brands" />
@@ -145,7 +151,7 @@ function Categories() {
             type="submit"
             onClick={() => formRef.current.requestSubmit()}
             className={clsx(" flex items-center", {
-              hidden: checkBrands.length < 1,
+              hidden: checkCategories.length < 1,
             })}
           >
             <icons.IconDelete className="text-2xl text-danger" />
@@ -181,19 +187,19 @@ function Categories() {
                 </tr>
               </thead>
               <tbody>
-                {brands.map((el, index) => (
+                {categories.map((el, index) => (
                   <tr role="row" key={index} className="border-b">
                     <td className="p-4">
                       <div>
                         <input
-                          {...register("checkBrands")}
+                          {...register("checkCategories")}
                           type="checkbox"
                           value={el._id}
                           className=" accent-pink-500"
                           onChange={(e) => {
                             handleCheck(e);
                           }}
-                          checked={checkBrands.includes(el._id)}
+                          checked={checkCategories.includes(el._id)}
                         />
                       </div>
                     </td>
@@ -212,13 +218,21 @@ function Categories() {
                     </td>
                     <td className="p-4">
                       <div className="whitespace-nowrap text-gray-400">
-                        <button className="mr-2">
-                          <icons.IconBxsEdit className="text-xl" />
-                        </button>
                         <button
                           className="mr-2"
                           type="button"
-                          onClick={() => deleteBrand(el._id)}
+                          onClick={() => {
+                            navigate(`../ecomerce/categories-edit/${el._id}`);
+                          }}
+                        >
+                          <icons.IconBxsEdit className="text-xl" />
+                        </button>
+                        <button
+                          type="button"
+                          className="mr-2"
+                          onClick={() => {
+                            deleteCategory(el._id);
+                          }}
                         >
                           <icons.IconDelete className="text-xl" />
                         </button>

@@ -48,3 +48,12 @@ exports.getAll = async (req, res) => {
     data: resDB,
   });
 };
+exports.getOne = async (req, res) => {
+  // populate sẽ tham chiếu thuộc tính nằm trong table Category, và đó là thuộc tính categories
+  const params = req.params;
+  const resDB = await Brand.findById(params.id).populate('categories');
+  return res.status(200).json({
+    status: 'SUCCESS',
+    data: resDB,
+  });
+};

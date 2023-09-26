@@ -5,9 +5,17 @@ const brandApi = {
     const url = "brand/getAll";
     return axiosClient.get(url, { params });
   },
+  getOne(id) {
+    const url = `brand/getOne/${id}`;
+    return axiosClient.get(url);
+  },
   add(body) {
     const url = "brand/add";
     return axiosClient.post(url, body);
+  },
+  update(body, id) {
+    const url = `brand/update/${id}`;
+    return axiosClient.patch(url, body);
   },
   delete(id) {
     const url = `brand/delete/${id}`;

@@ -18,6 +18,8 @@ const InputField = (props) => {
         )}
         {...(props.validator ?? {})}
         multiple={props.multiple}
+        onChange={(e) => props.setValue(e.target.value)}
+        value={props.value}
       />
       <p className={clsx("h-4 text-sm text-red-600")}>{props.error}</p>
     </div>

@@ -163,7 +163,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                             <NavLink
                               to="ecomerce/brands"
                               className={({ isActive }) => {
-                                console.log();
                                 return clsx(
                                   "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white",
                                   {
@@ -179,10 +178,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                           <li>
                             <NavLink
                               to="ecomerce/categories"
-                              className={({ isActive }) =>
-                                "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                (isActive && "!text-white")
-                              }
+                              className={({ isActive }) => {
+                                console.log();
+                                return clsx(
+                                  "group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white",
+                                  {
+                                    "!text-white":
+                                      isActive ||
+                                      pathname.includes("categories"),
+                                  },
+                                );
+                              }}
                             >
                               Categories
                             </NavLink>

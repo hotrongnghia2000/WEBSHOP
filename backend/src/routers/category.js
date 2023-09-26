@@ -11,5 +11,6 @@ router.patch('/update/:id', ctrls.update);
 router.delete('/delete/:id', ctrls.delete);
 router.delete('/deleteChecks', ctrls.deleteChecks);
 router.get('/getAll', ctrls.getAll);
+router.get('/getOne/:id', ctrls.getOne);
 
 module.exports = router;

@@ -12,7 +12,8 @@ import icons from "../../../icons";
 import * as brandSchema from "../../../validators/brand";
 
 const AddCategory = () => {
-  const [value, setValue] = React.useState([]);
+  const [categories, setCategories] = React.useState([]);
+  const [name, setName] = React.useState("");
   const [brands, setBrands] = React.useState([]);
   const {
     register,
@@ -28,18 +29,19 @@ const AddCategory = () => {
     await categoryApi
       .add(data)
       .then((res) => {
-        console.log(res);
+        reset();
+        setCategories([]);
+        setName("");
         Swal.fire({
           position: "center",
           icon: "success",
           title: "SUCCESS",
           html: `<strong>${res.data.data.name}</strong> đã được thêm!`,
         });
-        reset();
-        setValue([]);
       })
       .catch((err) => console.log(err));
   };
+  console.log("hello");
 
   React.useEffect(() => {
     (async function () {
@@ -66,6 +68,8 @@ const AddCategory = () => {
             fieldId="name"
             validator={register("name")}
             error={errors.name?.message}
+            value={name}
+            setValue={setName}
           />
           <SelectField
             // control được thêm vào để dùng cùng với controller, custom lại những components như react-select
@@ -75,8 +79,8 @@ const AddCategory = () => {
             defaultValue={null}
             options={brands}
             error={errors.brands?.message}
-            value={value}
-            setValue={setValue}
+            values={categories}
+            setValues={setCategories}
             isMulti
           />
           {/* button submit */}
