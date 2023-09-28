@@ -33,17 +33,19 @@ var schema = new mongoose.Schema(
       ref: 'Category',
     },
     thumb: {
-      type: {
-        originalname: {
-          type: String,
+      type: [
+        {
+          originalname: {
+            type: String,
+          },
+          path: {
+            type: String,
+          },
+          filename: {
+            type: String,
+          },
         },
-        path: {
-          type: String,
-        },
-        filename: {
-          type: String,
-        },
-      },
+      ],
     },
     images: {
       type: [

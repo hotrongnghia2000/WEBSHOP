@@ -31,14 +31,14 @@ const SelectField = (props) => {
             options={props.options}
             onChange={(e) => {
               e.value ? onChange(e.value) : onChange(e.map((c) => c.value));
-              props.setValues(e);
+              props.setValue(e);
             }}
             ref={selectRef}
             menuPlacement="auto"
             menuPosition={props.position}
             placeholder={props.placeholder}
             isMulti={props.isMulti}
-            value={props.values}
+            value={props.value}
           />
         )}
       />

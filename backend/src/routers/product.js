@@ -5,7 +5,15 @@ const vlds = require('../validators/product');
 const mws = require('../middlewares');
 const ctrls = require('../controllers/product');
 
-router.post('/add', mws.validate(vlds.add), ctrls.add);
+router.post(
+  '/add',
+  mws.uploadCloud.fields([
+    { name: 'thumb', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  mws.validate(vlds.add),
+  ctrls.add
+);
 router.patch(
   '/update/:id',
   mws.validate(vlds.update),
@@ -19,8 +27,11 @@ router.patch(
   ctrls.update
 );
 router.get('/filter', mws.validate(vlds.filter), ctrls.filter);
+router.get('/getAll', ctrls.getAll);
 router.patch('/rate/:id', mws.verifyToken, ctrls.rate);
 router.patch('/comment/:id', mws.verifyToken, ctrls.comment);
 router.patch('/repComment/:id/:parent_id', mws.verifyToken, ctrls.repComment);
+router.delete('/deleteChecks', ctrls.deleteChecks);
+router.delete('/delete/:id', ctrls.delete);
 
 module.exports = router;

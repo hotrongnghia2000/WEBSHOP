@@ -3,11 +3,47 @@ var slugify = require('slugify');
 const Product = require('../models/product');
 const MyError = require('../class/HandleThrowErr');
 
+exports.delete = async (req, res) => {
+  const { id } = req.params;
+
+  const resDB = await Product.findByIdAndDelete(id);
+  return res.status(200).json({
+    status: 'SUCCESS',
+    data: resDB,
+  });
+};
+
+exports.deleteChecks = async (req, res) => {
+  const query = req.query;
+  const resDB = await Product.deleteMany({ _id: query.checkBrands });
+  return res.status(200).json({
+    status: 'SUCCESS',
+    data: resDB,
+  });
+};
+
 exports.add = async (req, res) => {
   const body = req.body;
+  const files = req.files;
+  const data = { ...body, desc: JSON.parse(body.desc) };
+  for (const obj in files) {
+    for (const arr of files[obj]) {
+      data[obj] = [];
+      data[obj].push(arr);
+    }
+  }
 
-  body.slug = slugify(body.name, { lower: true });
-  const resDB = await Product.create(body);
+  // console.log(data);
+  // console.log(file);
+  data.slug = slugify(body.name, { lower: true });
+  const resDB = await Product.create(data);
+  return res.status(200).json({
+    status: 'SUCCESS',
+    data: resDB,
+  });
+};
+exports.getAll = async (req, res) => {
+  const resDB = await Product.find();
   return res.status(200).json({
     status: 'SUCCESS',
     data: resDB,
