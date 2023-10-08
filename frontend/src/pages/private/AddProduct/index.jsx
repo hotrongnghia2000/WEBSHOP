@@ -16,11 +16,14 @@ import * as productSchema from "../../../validators/product";
 function AddProduct() {
   const [categories, setCategories] = React.useState([]);
   const [brands, setBrands] = React.useState([]);
+  const [images, setImages] = React.useState([]);
+  const [thumb, setThumb] = React.useState([]);
   //
   const {
     register,
     handleSubmit,
     control,
+    getFieldState,
     formState: { errors, isSubmitting },
   } = useForm({
     mode: "onSubmit",
@@ -39,11 +42,6 @@ function AddProduct() {
       didOpen: () => {
         Swal.showLoading();
       },
-      // didClose: () => {
-      //   Swal.fire("Timeout", "Xử lý quá hạn, vui lòng thử lại!");
-      // },
-      // timer: 5000,
-      // allowOutsideClick: () => !Swal.isLoading(),
     });
     const formData = new FormData();
     // handle images
@@ -109,6 +107,7 @@ function AddProduct() {
           {/* chúng ta sẽ thêm ở file api của axios */}
           <form action="" className="w-full" onSubmit={handleSubmit(onSubmit)}>
             <InputField
+              control={control}
               label="Tên"
               placeholder="Click to type..."
               fieldId="name"
@@ -117,6 +116,7 @@ function AddProduct() {
               setValue={() => {}}
             />
             <InputField
+              control={control}
               label="Giá bán"
               placeholder="Click to type..."
               fieldId="price"
@@ -125,6 +125,7 @@ function AddProduct() {
               setValue={() => {}}
             />
             <InputField
+              control={control}
               label="Tồn kho"
               placeholder="Click to type..."
               fieldId="inventory"
@@ -157,25 +158,41 @@ function AddProduct() {
               setValue={() => {}}
             />
 
+            <div className="flex gap-2">
+              <div className="w-50">
+                <img src={thumb} />
+              </div>
+            </div>
             {/* thumb */}
             <InputField
+              control={control}
               label="Thumb"
               fieldId="thumb"
               type="file"
               validator={register("thumb")}
               error={errors.thumb?.message}
-              setValue={() => {}}
+              setFiles={setThumb}
             />
 
+            {/* images ban đầu là lấy từ cloudinary nên dùng el.path */}
+            {/* images sau khi onChange sẽ dùng URL.createObjectURL để lấy giá trị vừa thay đổi */}
+            <div className="flex items-end gap-2">
+              {images.map((el, index) => (
+                <div key={index} className="w-50">
+                  <img src={el.path || el} />
+                </div>
+              ))}
+            </div>
             {/* images */}
             <InputField
+              control={control}
               label="Images ( có thể chọn nhiều ảnh )"
               fieldId="images"
               type="file"
               multiple
               validator={register("images")}
               error={errors.images?.message}
-              setValue={() => {}}
+              setFiles={setImages}
             />
 
             {/* descs */}
@@ -183,12 +200,14 @@ function AddProduct() {
               return (
                 <section key={index} className="flex gap-2">
                   <InputField
+                    control={control}
                     label={`Tên thuộc tính ${index + 1}`}
                     fieldId={`descName${index}`}
                     validator={register(`desc.${index}.name`)}
                     setValue={() => {}}
                   />
                   <InputField
+                    control={control}
                     label={`Nội dung ${index + 1}`}
                     fieldId={`contentName${index}`}
                     validator={register(`desc.${index}.content`)}

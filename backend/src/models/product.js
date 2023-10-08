@@ -63,12 +63,14 @@ var schema = new mongoose.Schema(
       ],
     },
     desc: { type: Object },
-    ratings: [
-      {
-        star: { type: Number },
-        user_id: { type: mongoose.Types.ObjectId, ref: 'User', unique: true },
-      },
-    ],
+    ratings: {
+      type: [
+        {
+          star: { type: Number },
+          user_id: { type: mongoose.Types.ObjectId, ref: 'User' },
+        },
+      ],
+    },
     rating_avg: {
       type: Number,
       default: 0,
@@ -82,6 +84,7 @@ var schema = new mongoose.Schema(
       },
       { timestamps: true },
     ],
+    status: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

@@ -3,7 +3,9 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 function MainLayout() {
   return (
-    <div className={clsx("main-layout", "flex", "flex-col", "min-h-screen")}>
+    <div
+      className={clsx("main-layout", "flex", "flex-col", "min-h-screen", "w-")}
+    >
       <Header />
       <div className={clsx("page")}>
         <Outlet />

@@ -62,6 +62,7 @@ const AddBrand = () => {
       <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
         <form action="" className="w-full" onSubmit={handleSubmit(onSubmit)}>
           <InputField
+            control={control}
             label="Tên thương hiệu"
             placeholder="Click to type..."
             fieldId="name"
@@ -78,8 +79,8 @@ const AddBrand = () => {
             defaultValue={null}
             options={categories}
             error={errors.categories?.message}
-            values={brands}
-            setValues={setBrands}
+            value={brands}
+            setValue={setBrands}
             isMulti
           />
           {/* button submit */}

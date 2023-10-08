@@ -25,7 +25,15 @@ function Brands() {
   } = useForm({
     mode: "onSubmit",
   });
+  // delete check
   const onSubmitDeleteCheck = async (data) => {
+    const delProducts = products.filter((el) => data.checks.includes(el._id));
+    let files = [];
+    for (const el of delProducts) {
+      files.push(...el.thumb, ...el.images);
+    }
+    const filenames = files.map((el) => el.filename);
+    data.filenames = filenames || [];
     Swal.fire({
       title: "Bạn có chắc muốn xóa ?",
       text: "Bạn sẽ không thể khôi phục lại điều này",
@@ -37,6 +45,7 @@ function Brands() {
       confirmButtonText: "Xác nhận xóa",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        console.log(data);
         await productApi
           .deleteChecks(data)
           .then(() => {
@@ -56,6 +65,34 @@ function Brands() {
   };
 
   // function
+  // handle status product
+  const handleStatus = async (el) => {
+    Swal.fire({
+      title: "Đang xử lý",
+      html: "Vui lòng chờ trong giây lát!",
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+    await productApi.update({ status: !el.status }, el._id).then((res) => {
+      Swal.close();
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "SUCCESS",
+        html: "<p>Đã cập nhật thành công thành công!!!<p/>",
+        showConfirmButton: true,
+        confirmButtonText: "Xác nhận",
+      });
+      if (res.status === 200)
+        setProducts(
+          products.map((el_1) => {
+            if (el_1._id !== el._id) return el_1;
+            else return { ...el_1, status: !el_1.status };
+          }),
+        );
+    });
+  };
   const handleCheckAll = (e) => {
     setIsCheckAll(e.target.checked);
     setChecks(products.map((el) => el._id));
@@ -78,6 +115,10 @@ function Brands() {
 
   //
   const del = async (id) => {
+    const product = products.filter((el) => el._id === id)[0];
+    let files = [];
+    files.push(...product.thumb, ...product.images);
+    const filenames = files.map((el) => el.filename);
     Swal.fire({
       title: "Bạn có chắc muốn xóa ?",
       text: "Bạn sẽ không thể khôi phục lại điều này",
@@ -90,7 +131,7 @@ function Brands() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await productApi
-          .delete(id)
+          .delete(id, { filenames: filenames })
           .then((res) => {
             setProducts((prev) => prev.filter((el) => el._id !== id));
             Swal.fire(
@@ -113,7 +154,6 @@ function Brands() {
         .then((res) => {
           const data = res.data.data;
           setProducts(data);
-          console.log(data);
         })
         .catch((err) => console.log(err));
     })();
@@ -145,11 +185,19 @@ function Brands() {
         <div className="flex items-center justify-between">
           <form className="flex w-fit items-center">
             <span className="mr-2 whitespace-nowrap text-sm">Tìm kiếm:</span>
-            <InputField placeholder="Click to search..." className="!p-1" />
+            <InputField
+              control={control}
+              placeholder="Click to search..."
+              className="!p-1"
+              setValue={() => {}}
+              fieldId="search"
+            />
           </form>
           <Button
             type="submit"
-            onClick={() => formRef.current.requestSubmit()}
+            onClick={() => {
+              formRef.current.requestSubmit();
+            }}
             className={clsx(" flex items-center", {
               hidden: checks.length < 1 || products.length < 1,
             })}
@@ -209,7 +257,7 @@ function Brands() {
                       {moment(el.createdAt).format("DD-MM-YYYY")}
                     </td>
                     <td className="p-4">
-                      <div className="flex gap-2">
+                      <div className="flex items-center">
                         <div className="h-12 w-12">
                           <img src={el.thumb[0].path} />
                         </div>
@@ -219,7 +267,18 @@ function Brands() {
                     <td className="p-4">{el.price}</td>
                     <td className="p-4">{el.sold}</td>
                     <td className="p-4">{el.inventory}</td>
-                    <td className="p-4">Active</td>
+                    <td className="p-4">
+                      <label className="relative mr-5 inline-flex cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          value=""
+                          className="peer sr-only"
+                          onChange={() => handleStatus(el)}
+                          checked={el.status}
+                        />
+                        <div className="peer h-6 w-11 scale-[60%] rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white dark:border-gray-600 dark:bg-gray-700"></div>
+                      </label>
+                    </td>
                     <td className="p-4">
                       <div className="whitespace-nowrap text-gray-400">
                         <button

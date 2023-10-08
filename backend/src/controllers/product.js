@@ -5,8 +5,16 @@ const MyError = require('../class/HandleThrowErr');
 
 exports.delete = async (req, res) => {
   const { id } = req.params;
-
+  const query = req.query;
+  console.log(query);
+  console.log(id);
   const resDB = await Product.findByIdAndDelete(id);
+  if (resDB) {
+    cloudinary.api.delete_resources(query.filenames, function (error, result) {
+      console.log(result, error);
+    });
+  }
+  console.log(resDB);
   return res.status(200).json({
     status: 'SUCCESS',
     data: resDB,
@@ -15,7 +23,25 @@ exports.delete = async (req, res) => {
 
 exports.deleteChecks = async (req, res) => {
   const query = req.query;
-  const resDB = await Product.deleteMany({ _id: query.checkBrands });
+  console.log(query);
+  const resDB = await Product.deleteMany({ _id: query.checks });
+  if (resDB) {
+    cloudinary.api.delete_resources(query.filenames, function (error, result) {
+      console.log(result, error);
+    });
+  }
+  return res.status(200).json({
+    status: 'SUCCESS',
+    data: resDB,
+  });
+};
+
+exports.getOne = async (req, res) => {
+  // populate sẽ tham chiếu thuộc tính nằm trong table Category, và đó là thuộc tính categories
+  const params = req.params;
+  const resDB = await Product.findById(params.id)
+    .populate('brand_id')
+    .populate('category_id');
   return res.status(200).json({
     status: 'SUCCESS',
     data: resDB,
@@ -55,40 +81,46 @@ exports.update = async (req, res) => {
   const body = req.body;
   const files = req.files;
 
-  if (files) {
-    // Giữ lại thông tin của product trước khi update
-    var product = await Product.findById(params.id);
-    // gán thông tin của file đã upload lên cloudinary vào body
-    // body.thumb có thể nhận nhiều property của object, nhưng khi đưa lên db thì db chỉ nhận những property đã khai báo trên schema
-    // muốn nhận tất cả thì khai báo schema type object
-    body.thumb = files.thumb[0];
-    body.images = files.images;
-  }
-  if (!Object.keys(body).length)
-    throw new MyError('không có gì để update', 400);
-  // slugify
+  if (files) var product = await Product.findById(params.id);
+
+  if (body.desc) body.desc = JSON.parse(body.desc);
   if (body.name) body.slug = slugify(body.name, { lower: true });
+
+  for (const obj in files) {
+    for (const arr of files[obj]) {
+      if (!body[obj]) body[obj] = [];
+      body[obj].push(arr);
+    }
+  }
 
   const resDB = await Product.findByIdAndUpdate(params.id, body, {
     new: true,
   });
-  // clear file cũ trên cloudinary
+  // clear các file đã lưu trước đó trên cloudinary
   if (resDB && files) {
-    console.log(files.thumb[0]);
-    if (files.thumb[0] && product.thumb[0])
-      cloudinary.uploader.destroy(product.thumb.filename);
+    if (files.thumb && product.thumb) {
+      for (let item of product.thumb) {
+        cloudinary.uploader.destroy(item.filename);
+      }
+    }
     if (files.images && product.images) {
       for (let item of product.images) {
         cloudinary.uploader.destroy(item.filename);
       }
     }
   }
-
   return res.status(200).json({
     status: 'SUCCESS',
     data: resDB,
   });
 };
+
+// exports.filter = async (req, res) => {
+//   console.log(req.query);
+//   return res.status(200).json({
+//     status: 'SUCCESS',
+//   });
+// };
 
 exports.filter = async (req, res) => {
   const query = req.query;
@@ -108,6 +140,8 @@ exports.filter = async (req, res) => {
   );
   // chuyển đổi myFilter về JSON
   myFilter = JSON.parse(myFilter);
+  myFilter.name = { $regex: query.name, $options: 'i' };
+  console.log(myFilter);
 
   // 2. SORT
   const mySorter = query.sort?.split(',').join(' ') || '-createdAt';
@@ -120,11 +154,11 @@ exports.filter = async (req, res) => {
   const limit = query.limit || 2;
   const skip = (page - 1) * limit;
 
-  const resDB = await Product.find(myFilter)
-    .sort(mySorter)
-    .select(mySelector)
-    .skip(skip)
-    .limit(limit);
+  const resDB = await Product.find(myFilter);
+  // .sort(mySorter)
+  // .select(mySelector)
+  // .skip(skip)
+  // .limit(limit);
 
   return res.status(200).json({
     status: 'SUCCESS',

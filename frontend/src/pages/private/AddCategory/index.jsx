@@ -63,6 +63,7 @@ const AddCategory = () => {
       <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
         <form action="" className="w-full" onSubmit={handleSubmit(onSubmit)}>
           <InputField
+            control={control}
             label="Tên loại"
             placeholder="Click to type..."
             fieldId="name"
@@ -79,8 +80,8 @@ const AddCategory = () => {
             defaultValue={null}
             options={brands}
             error={errors.brands?.message}
-            values={categories}
-            setValues={setCategories}
+            value={categories}
+            setValue={setCategories}
             isMulti
           />
           {/* button submit */}

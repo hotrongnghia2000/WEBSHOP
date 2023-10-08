@@ -13,3 +13,12 @@ export const add = yup.object().shape({
     return value && value.length;
   }),
 });
+export const edit = yup.object().shape({
+  // name: yup.string(),
+  // price: yup.number().typeError("trường này bắt buộc và phải là số").min(1000),
+  // inventory: yup.number().typeError("trường này bắt buộc và phải là số").min(0),
+  // brand_id: yup.string(),
+  // category_id: yup.string(),
+  // thumb: yup.mixed(),
+  // images: yup.mixed(),
+});

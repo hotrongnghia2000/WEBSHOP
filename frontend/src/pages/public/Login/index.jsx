@@ -15,6 +15,7 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -76,19 +77,23 @@ const Login = () => {
                   onSubmit={handleSubmit(onSubmit)}
                 >
                   <InputField
+                    control={control}
                     label="Email"
                     placeholder="Vui lòng nhập email"
                     fieldId="email"
                     validator={register("email")}
                     error={errors.email?.message}
+                    setValue={() => {}}
                   />
                   <InputField
+                    control={control}
                     label="Mật khẩu"
                     type="password"
                     placeholder="Vui lòng nhập mật khẩu"
                     fieldId="password"
                     validator={register("password")}
                     error={errors.password?.message}
+                    setValue={() => {}}
                   />
                   <div id="button" className="my-5 flex w-full flex-col">
                     <Button type="submit" name="Gửi" primary />

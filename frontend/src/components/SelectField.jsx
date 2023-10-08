@@ -24,8 +24,10 @@ const SelectField = (props) => {
             classNames={{
               container: () => clsx("min-w-fit"),
               control: (state) =>
-                clsx("!border-gray-200 !shadow-none focus-within:ring-1", {
+                clsx(" !shadow-none focus-within:ring-1", {
                   "!ring-focusborder": state.isFocused,
+                  "!border-gray-200": !props.isDirty,
+                  "!border-green-600": props.isDirty,
                 }),
             }}
             options={props.options}

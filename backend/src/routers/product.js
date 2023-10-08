@@ -33,5 +33,7 @@ router.patch('/comment/:id', mws.verifyToken, ctrls.comment);
 router.patch('/repComment/:id/:parent_id', mws.verifyToken, ctrls.repComment);
 router.delete('/deleteChecks', ctrls.deleteChecks);
 router.delete('/delete/:id', ctrls.delete);
+router.get('/getOne/:id', ctrls.getOne);
+router.get('/filter', ctrls.filter);
 
 module.exports = router;

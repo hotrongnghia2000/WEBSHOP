@@ -111,6 +111,11 @@ function Brands() {
         .getAll()
         .then((res) => {
           const data = res.data.data;
+          // Sắp xếp các phần tử trong data.categories theo bảng chữ cái
+          for (const el of data) {
+            // localeCompare so sánh giá trị của a.name và b.name => trả về âm, dương hoặc 0
+            el.categories?.sort((a, b) => a.name.localeCompare(b.name));
+          }
           setBrands(data);
         })
         .catch((err) => console.log(err));
@@ -143,7 +148,12 @@ function Brands() {
         <div className="flex items-center justify-between">
           <form className="flex w-fit items-center">
             <span className="mr-2 whitespace-nowrap text-sm">Tìm kiếm:</span>
-            <InputField placeholder="Click to search..." className="!p-1" />
+            <InputField
+              control={control}
+              fieldId="brand-search"
+              placeholder="Click to search..."
+              className="!p-1"
+            />
           </form>
           <Button
             type="submit"

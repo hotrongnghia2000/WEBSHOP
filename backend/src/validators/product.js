@@ -29,7 +29,7 @@ exports.update = () => {
       .if(body('price').notEmpty())
       .isInt({ gt: 1000, lt: 1000000000 }),
 
-    body('images[*].url', 'url is required').exists(),
+    // body('images[*].url', 'url is required').exists(),
     // body('images[*].desc', 'desc is required').exists(),
 
     body('inventory', 'inventory is invalid')

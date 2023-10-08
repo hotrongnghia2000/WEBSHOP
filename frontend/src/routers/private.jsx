@@ -7,6 +7,7 @@ import Categories from "../pages/private/Categories";
 import Ecomerce from "../pages/private/Ecomerce";
 import EditBrand from "../pages/private/EditBrand";
 import EditCategory from "../pages/private/EditCategory";
+import EditProduct from "../pages/private/EditProduct";
 import Orders from "../pages/private/Orders";
 import Products from "../pages/private/Products";
 import HandleRole from "./handleRole";
@@ -35,6 +36,7 @@ export let privateRouter = [
 
           { path: "/ecomerce/products", element: <Products /> },
           { path: "/ecomerce/products-add", element: <AddProduct /> },
+          { path: "/ecomerce/products-edit/:id", element: <EditProduct /> },
 
           { path: "/ecomerce/orders", element: <Orders /> },
         ],

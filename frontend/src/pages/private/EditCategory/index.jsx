@@ -80,6 +80,7 @@ const EditCategory = () => {
       <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
         <form action="" className="w-full" onSubmit={handleSubmit(onSubmit)}>
           <InputField
+            control={control}
             label="Tên loại"
             placeholder="Click to type..."
             fieldId="name"
@@ -96,8 +97,8 @@ const EditCategory = () => {
             defaultValue={values}
             options={brands}
             error={errors.brands?.message}
-            values={values}
-            setValues={setValues}
+            value={values}
+            setValue={setValues}
             isMulti
           />
           {/* button submit */}
