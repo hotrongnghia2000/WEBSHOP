@@ -14,6 +14,8 @@
     @apply relative z-1 bg-whiten text-base font-normal text-body;
   }
   :root {
+    --header-height: 61px;
+    --paging-height: 80px;
   }
 }
 
@@ -23,4 +25,63 @@
 
 /* thêm những thuộc tính ngoại lệ, không bao gồm trong tailwind */
 @layer utilities {
+}
+
+button.slick-arrow,
+button.slick-arrow:focus {
+  width: 2rem;
+  height: 4rem;
+  z-index: 9;
+  border-radius: 5px;
+  background-color: #246764;
+  opacity: 0.3;
+  display: flex;
+}
+
+button.slick-arrow:hover {
+  opacity: initial;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+button.slick-arrow:before {
+  font-size: 2rem;
+  color: #666;
+}
+button.slick-arrow:hover:before {
+  color: #666;
+}
+button.slick-next {
+  right: 0;
+  background: rgba(255, 255, 255, 0.9);
+}
+button.slick-prev {
+  left: 0;
+  background: rgba(255, 255, 255, 0.9);
+}
+button.slick-next:before {
+  content: "\276F";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+}
+button.slick-prev:before {
+  content: "\276E";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+}
+
+.slick-dots.slick-thumb li {
+  width: var(--paging-height);
+  height: var(--paging-height);
+}
+.slick-dots.slick-thumb {
+  bottom: -calc(25px + var(--paging-height));
+}
+.slick-dots.slick-thumb li {
+  filter: grayscale(100%);
+}
+.slick-dots.slick-thumb li.slick-active {
+  filter: initial;
 }

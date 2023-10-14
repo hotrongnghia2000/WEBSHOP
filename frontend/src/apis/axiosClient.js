@@ -15,7 +15,15 @@ const axiosClient = axios.create({
 
 // Add a request interceptor
 axiosClient.interceptors.request.use(
-  function (config) {
+  async (config) => {
+    let userLocalStorage = window.localStorage.getItem("persist:user");
+    if (userLocalStorage && typeof userLocalStorage === "string") {
+      userLocalStorage = JSON.parse(userLocalStorage);
+      const token = JSON.parse(userLocalStorage?.token);
+      config.headers = { authorization: `Bearer ${token}` };
+      return config;
+    }
+
     // Do something before request is sent
     return config;
   },

@@ -59,17 +59,29 @@ function AddProduct() {
     for (const key in data) {
       formData.append(key, data[key]);
     }
-    await productApi.add(formData).then((res) => {
-      console.log(res);
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "SUCCESS",
-        html: "<p>Đã thêm mới thành công!!!<p/>",
-        showConfirmButton: true,
-        confirmButtonText: "Xác nhận",
+    await productApi
+      .add(formData)
+      .then((res) => {
+        console.log(res);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "SUCCESS",
+          html: "<p>Đã thêm mới thành công!!!<p/>",
+          showConfirmButton: true,
+          confirmButtonText: "Xác nhận",
+        });
+      })
+      .catch((err) => {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: "Đã xảy ra lỗi!",
+          html: err.data.message,
+          showConfirmButton: true,
+          confirmButtonText: "Xác nhận",
+        });
       });
-    });
   };
 
   // Gọi api

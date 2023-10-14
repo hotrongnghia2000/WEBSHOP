@@ -17,6 +17,7 @@ const ChangePassword = () => {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     mode: "onBlur",
@@ -165,6 +166,7 @@ const ChangePassword = () => {
                   onSubmit={handleSubmit(onSubmit)}
                 >
                   <InputField
+                    control={control}
                     label="Email"
                     placeholder="Vui lòng nhập email"
                     fieldId="email"
@@ -172,6 +174,7 @@ const ChangePassword = () => {
                     error={errors.email?.message}
                   />
                   <InputField
+                    control={control}
                     label="Mật khẩu"
                     type="password"
                     placeholder="Vui lòng nhập mật khẩu"
@@ -180,6 +183,7 @@ const ChangePassword = () => {
                     error={errors.password?.message}
                   />
                   <InputField
+                    control={control}
                     label="Xác nhận mật khẩu"
                     type="password"
                     placeholder="Vui lòng nhập lại mật khẩu"

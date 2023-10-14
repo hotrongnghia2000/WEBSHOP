@@ -14,6 +14,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(false);
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -161,6 +162,7 @@ const Register = () => {
                   onSubmit={handleSubmit(onSubmit)}
                 >
                   <InputField
+                    control={control}
                     label="Email"
                     placeholder="Vui lòng nhập email"
                     fieldId="email"
@@ -168,6 +170,7 @@ const Register = () => {
                     error={errors.email?.message}
                   />
                   <InputField
+                    control={control}
                     label="Mật khẩu"
                     type="password"
                     placeholder="Vui lòng nhập mật khẩu"
@@ -176,6 +179,7 @@ const Register = () => {
                     error={errors.password?.message}
                   />
                   <InputField
+                    control={control}
                     label="Xác nhận mật khẩu"
                     type="password"
                     placeholder="Vui lòng nhập lại mật khẩu"
@@ -184,6 +188,7 @@ const Register = () => {
                     error={errors.confirm?.message}
                   />
                   <InputField
+                    control={control}
                     label="Địa chỉ"
                     placeholder="Vui lòng nhập địa chỉ"
                     fieldId="address"

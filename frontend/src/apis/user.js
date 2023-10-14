@@ -25,6 +25,18 @@ const userApi = {
     const url = "user/finishChangePassword";
     return axiosClient.post(url, body, { withCredentials: true });
   },
+  updateCart(body) {
+    const url = `user/updateCart`;
+    return axiosClient.patch(url, body);
+  },
+  delCart(body) {
+    const url = `user/delCart`;
+    return axiosClient.patch(url, body);
+  },
+  getCurrent() {
+    const url = `user/getCurrent`;
+    return axiosClient.get(url);
+  },
 };
 
 export default userApi;

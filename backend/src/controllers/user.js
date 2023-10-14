@@ -149,7 +149,7 @@ exports.login = async (req, res) => {
 
   // tạo AT
   const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
-    expiresIn: 60 * 1000,
+    expiresIn: 7 * 24 * 60 * 60 * 1000,
   });
 
   // loại bỏ password trước khi trả user data về client
@@ -195,7 +195,69 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.getCurrent = async (req, res) => {
-  res.status(200).send(req.user);
+  const user = await User.findById(req.user._id).populate('cart.product');
+  res.status(200).json({
+    status: 'SUCCESS',
+    data: user,
+  });
+};
+
+exports.delCart = async (req, res) => {
+  const { _id } = req.user;
+  const { id } = req.body;
+
+  let resDB = null;
+  if (id) {
+    resDB = await User.findByIdAndUpdate(
+      _id,
+      { $pull: { cart: { product: id } } },
+      { new: true }
+    );
+  } else {
+    resDB = await User.findByIdAndUpdate(
+      _id,
+      { $set: { cart: [] } },
+      { new: true }
+    );
+  }
+
+  return res.status(200).json({
+    status: 'SUCCESS',
+    data: resDB,
+  });
+};
+
+exports.updateCart = async (req, res) => {
+  const { _id } = req.user;
+  const { productId, quantity = 1 } = req.body;
+  if (!productId) throw new MyError('missing inputs');
+
+  const user = await User.findById(_id);
+  // kiểm tra xem sản phẩm có trong cart hay chưa
+  const product = user.cart.find((el) => el.product.toString() === productId);
+  if (!product) {
+    const resDB = await User.findByIdAndUpdate(
+      _id,
+      {
+        $push: { cart: { product: productId, quantity } },
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      status: 'SUCCESS',
+      data: resDB,
+    });
+  } else {
+    const resDB = await User.updateOne(
+      { cart: { $elemMatch: product } },
+      { $set: { 'cart.$.quantity': quantity } },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: 'SUCCESS',
+      data: resDB,
+    });
+  }
 };
 
 exports.order = async (req, res) => {

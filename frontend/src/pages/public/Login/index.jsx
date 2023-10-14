@@ -33,15 +33,12 @@ const Login = () => {
             token: res.data.accessToken,
           }),
         );
-        if (data.role === "admin") navigate("/admin");
-        else navigate("/home");
+        navigate("/home");
         Swal.fire({
           position: "center",
           icon: "success",
           title: "SUCCESS",
           html: res.data.message,
-          showConfirmButton: false,
-          timer: 1000,
         });
       })
       .catch((err) => {

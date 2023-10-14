@@ -52,6 +52,9 @@ exports.add = async (req, res) => {
   const body = req.body;
   const files = req.files;
   const data = { ...body, desc: JSON.parse(body.desc) };
+  const isExistProduct = await Product.findOne({ name: body.name });
+  if (isExistProduct)
+    throw new MyError('Vui lòng dùng tên khác, tên sản phẩm đã tồn tại!', 400);
   for (const obj in files) {
     for (const arr of files[obj]) {
       data[obj] = [];
@@ -115,13 +118,6 @@ exports.update = async (req, res) => {
   });
 };
 
-// exports.filter = async (req, res) => {
-//   console.log(req.query);
-//   return res.status(200).json({
-//     status: 'SUCCESS',
-//   });
-// };
-
 exports.filter = async (req, res) => {
   const query = req.query;
 
@@ -140,9 +136,11 @@ exports.filter = async (req, res) => {
   );
   // chuyển đổi myFilter về JSON
   myFilter = JSON.parse(myFilter);
-  myFilter.name = { $regex: query.name, $options: 'i' };
+  if (query.name) {
+    myFilter.name = { $regex: query.name, $options: 'i' };
+  }
+  if (!myFilter) myFilter = null;
   console.log(myFilter);
-
   // 2. SORT
   const mySorter = query.sort?.split(',').join(' ') || '-createdAt';
 
@@ -151,20 +149,23 @@ exports.filter = async (req, res) => {
 
   // 4. PAGINATION
   const page = query.page || 1;
-  const limit = query.limit || 2;
+  const limit = query.limit || 4;
   const skip = (page - 1) * limit;
 
-  const resDB = await Product.find(myFilter);
-  // .sort(mySorter)
-  // .select(mySelector)
-  // .skip(skip)
-  // .limit(limit);
-
-  return res.status(200).json({
-    status: 'SUCCESS',
-    count: resDB.length,
-    data: resDB,
-  });
+  const resDB = await Product.find(myFilter)
+    .populate('category_id')
+    .sort(mySorter)
+    .select(mySelector)
+    .skip(skip)
+    .limit(limit)
+    .then(async (resolve) => {
+      const count = await Product.find(myFilter).countDocuments();
+      return res.status(200).json({
+        status: 'SUCCESS',
+        count: count,
+        data: resolve,
+      });
+    });
 };
 
 exports.rate = async (req, res) => {

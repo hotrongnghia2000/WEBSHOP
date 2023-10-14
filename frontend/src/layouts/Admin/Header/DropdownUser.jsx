@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import UserOne from "../../../assets/avatars/admin_1.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
+import { logout } from "../../../app/adminUser";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.adminUser);
 
   const trigger = useRef();
   const dropdown = useRef();
@@ -45,14 +50,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            Hi, {user.current?.email?.split("@")[0]}
           </span>
-          <span className="block text-xs">UX Designer</span>
         </span>
-
-        <div className="h-12 w-12 overflow-hidden rounded-full">
-          <img src={UserOne} alt="User" />
-        </div>
 
         <svg
           className={`hidden fill-current sm:block ${
@@ -155,7 +155,20 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+          onClick={() => {
+            dispatch(logout());
+            setDropdownOpen(false);
+            navigate("/admin-login");
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "SUCCESS",
+              html: "Bạn đã đăng xuất thành công!",
+            });
+          }}
+        >
           <svg
             className="fill-current"
             width="22"

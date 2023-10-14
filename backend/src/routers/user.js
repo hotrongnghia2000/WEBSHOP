@@ -26,5 +26,7 @@ router.post('/login', mws.validate(vlds.login), ctrls.login);
 router.get('/refreshToken', ctrls.refreshToken);
 router.get('/getCurrent', mws.verifyToken, ctrls.getCurrent);
 router.post('/order', mws.verifyToken, ctrls.order);
+router.patch('/updateCart', mws.verifyToken, ctrls.updateCart);
+router.patch('/delCart', mws.verifyToken, ctrls.delCart);
 
 module.exports = router;

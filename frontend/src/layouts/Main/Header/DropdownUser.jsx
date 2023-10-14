@@ -1,7 +1,9 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { logout } from "../../../app/user";
 import icons from "../../../icons";
 
 const DropdownUser = () => {
@@ -9,6 +11,7 @@ const DropdownUser = () => {
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   // close on click outside
   useEffect(() => {
@@ -46,13 +49,13 @@ const DropdownUser = () => {
       <Link
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-4"
+        className={clsx("flex items-center gap-4", { hidden: !user.current })}
         to="#"
       >
         <div className="ml-2 flex cursor-pointer items-center gap-x-1 rounded-md border px-2 py-1 hover:bg-gray-100">
           <icons.IconAccountCircleOutline className="text-2xl" />
           <span className="hidden text-sm font-medium md:block">
-            Hi, {user.current.email?.split("@")[0]}
+            Hi, {user.current?.email?.split("@")[0]}
           </span>
 
           <svg
@@ -157,7 +160,19 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary ">
+        <button
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary "
+          onClick={() => {
+            dispatch(logout());
+            setDropdownOpen(false);
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "SUCCESS",
+              html: "Bạn đã đăng xuất thành công!",
+            });
+          }}
+        >
           <svg
             className="fill-current"
             width="22"

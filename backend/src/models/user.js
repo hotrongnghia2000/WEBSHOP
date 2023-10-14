@@ -19,21 +19,10 @@ var schema = new mongoose.Schema(
       type: String,
       default: 'user',
     },
-    order: [
+    cart: [
       {
-        products: [
-          {
-            product: {
-              type: Object,
-            },
-            quantity: {
-              type: Number,
-            },
-          },
-        ],
-        total_price: {
-          type: Number,
-        },
+        product: { type: mongoose.Types.ObjectId, ref: 'Product' },
+        quantity: Number,
       },
     ],
     refreshToken: {

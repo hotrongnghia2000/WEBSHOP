@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React, { useRef } from "react";
+import { Link } from "react-router-dom";
 import productApi from "../../../apis/product";
 import useDebounce from "../../../hooks/useDebounce";
 import icons from "../../../icons";
@@ -9,7 +10,7 @@ const SearchProduct = () => {
   const [results, setResults] = React.useState([]);
   const [value, setValue] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
-  const [dropdownOpen, setDropdownOpen] = React.useState(true);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
   const dropdown = useRef(null);
   const inputRef = useRef(null);
@@ -21,6 +22,8 @@ const SearchProduct = () => {
     if (!value.startsWith(" ")) {
       setValue(value);
     }
+    //
+    if (!value) setDropdownOpen(false);
   };
   React.useEffect(() => {
     if (!value.trim()) {
@@ -32,9 +35,27 @@ const SearchProduct = () => {
         console.log(res);
         setResults(res.data.data);
         setIsLoading(false);
+        //
+        if (res.data.data.length) setDropdownOpen(true);
       });
     })();
   }, [debounceValue]);
+
+  //
+  React.useEffect(() => {
+    const clickHandler = ({ target }) => {
+      if (!dropdown.current) return;
+      if (
+        !dropdownOpen ||
+        dropdown.current.contains(target) ||
+        inputRef.current.contains(target)
+      )
+        return;
+      setDropdownOpen(false);
+    };
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
   return (
     <form className="relative w-full min-w-[200px] max-w-[400px] rounded-md border-[1.5px] border-transparent bg-whiten text-sm focus-within:border-[#16182333]">
       <div className="relative flex h-full w-full items-center ">
@@ -45,6 +66,7 @@ const SearchProduct = () => {
           placeholder="Click to type..."
           value={value}
           onChange={handleValue}
+          onFocus={() => setDropdownOpen(true)}
         />
         {/* clear */}
         {value && !isLoading && (
@@ -93,20 +115,26 @@ const SearchProduct = () => {
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
         className={`absolute right-0 mt-4 flex w-full flex-col rounded-md border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${
-          dropdownOpen === true ? "block" : "hidden"
+          dropdownOpen === true && results.length !== 0 ? "block" : "hidden"
         }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-4 py-6 dark:border-strokedark">
           {results.map((el, index) => (
-            <li key={index} className="flex items-center gap-2">
-              <div className="w-10 ">
-                <img src={el.thumb[0].path} />
-              </div>
-              <div>
-                <p>{ultils.capitalizeFirst(el.name)}</p>
-                <p>{el.price}</p>
-              </div>
-            </li>
+            <Link
+              to={`/${el.category_id.name.toLowerCase()}/${el._id}/${el.slug}`}
+              key={index}
+              onClick={() => setDropdownOpen(false)}
+            >
+              <li className="flex h-full w-full items-center gap-2">
+                <div className="w-10 ">
+                  <img src={el.thumb[0].path} />
+                </div>
+                <div>
+                  <p className="capitalize">{el.name}</p>
+                  <p className="text-red-600">{ultils.splitPrice(el.price)}</p>
+                </div>
+              </li>
+            </Link>
           ))}
         </ul>
       </div>

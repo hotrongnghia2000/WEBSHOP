@@ -4,10 +4,17 @@ import Header from "./Header";
 function MainLayout() {
   return (
     <div
-      className={clsx("main-layout", "flex", "flex-col", "min-h-screen", "w-")}
+      className={clsx(
+        "main-layout",
+        "flex",
+        "flex-col",
+        "relative min-h-screen",
+      )}
     >
-      <Header />
-      <div className={clsx("page")}>
+      <div className="z-10">
+        <Header />
+      </div>
+      <div className="flex justify-center pt-[var(--header-height)]">
         <Outlet />
       </div>
     </div>

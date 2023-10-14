@@ -110,11 +110,12 @@ function Brands() {
         // getAll phải có dấu ngoặc () đi kèm
         .getAll()
         .then((res) => {
+          console.log(res);
           const data = res.data.data;
           // Sắp xếp các phần tử trong data.categories theo bảng chữ cái
           for (const el of data) {
             // localeCompare so sánh giá trị của a.name và b.name => trả về âm, dương hoặc 0
-            el.categories?.sort((a, b) => a.name.localeCompare(b.name));
+            el.categories?.sort((a, b) => a.name?.localeCompare(b.name));
           }
           setBrands(data);
         })

@@ -70,13 +70,16 @@ const EditBrand = () => {
         setValues(values);
         //
         setValue("name", data.name);
-        setValue("categories", values);
+        setValue(
+          "categories",
+          values.map((el) => el.value),
+        );
       });
     })();
   }, []);
   return (
     <div>
-      <Breadcrumb pageName="Brands Edit" />
+      <Breadcrumb pageName="Brand Edit" />
       <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
         <form action="" className="w-full" onSubmit={handleSubmit(onSubmit)}>
           <InputField

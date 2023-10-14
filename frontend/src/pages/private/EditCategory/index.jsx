@@ -70,7 +70,10 @@ const EditCategory = () => {
         setValues(values);
         //
         setValue("name", data.name);
-        setValue("brands", values);
+        setValue(
+          "brands",
+          values.map((el) => el.value),
+        );
       });
     })();
   }, []);

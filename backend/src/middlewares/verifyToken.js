@@ -2,8 +2,7 @@ const MyError = require('../class/HandleThrowErr');
 const jwt = require('jsonwebtoken');
 
 module.exports = async (req, res, next) => {
-  const auth = req.headers.authorization;
-
+  const auth = req.headers?.authorization;
   if (!auth || !auth.startsWith('Bearer'))
     throw new MyError('authorization không có hoặc không hợp lệ!');
   const accessToken = auth.split(' ')[1];

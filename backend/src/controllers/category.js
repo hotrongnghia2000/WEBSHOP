@@ -13,6 +13,7 @@ exports.add = async (req, res) => {
 exports.update = async (req, res) => {
   const { id } = req.params;
   const body = req.body;
+  console.log(body);
 
   const resDB = await Category.findByIdAndUpdate(id, body, { new: true });
   return res.status(200).json({
