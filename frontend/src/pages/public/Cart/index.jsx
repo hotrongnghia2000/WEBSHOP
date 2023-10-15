@@ -6,7 +6,7 @@ import userApi from "../../../apis/user";
 import { getCurrent } from "../../../app/user/asyncActions";
 import Button from "../../../components/Button";
 import icons from "../../../icons";
-import { splitPrice } from "../../../utils";
+import { splitPrice } from "../../../utils/helpers";
 
 function Cart() {
   //

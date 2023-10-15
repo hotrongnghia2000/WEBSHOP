@@ -22,3 +22,10 @@ export const edit = yup.object().shape({
   // thumb: yup.mixed(),
   // images: yup.mixed(),
 });
+export const rate = yup.object().shape({
+  star: yup
+    .number()
+    .typeError("Trường này bắt buộc và phải là số")
+    .min(1)
+    .max(5),
+});

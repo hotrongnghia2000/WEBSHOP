@@ -172,6 +172,7 @@ exports.rate = async (req, res) => {
   const params = req.params;
   const body = req.body;
   const user = req.user;
+  console.log(body);
 
   const product = await Product.findById(params.id);
   // kiểm tra người dùng từng đánh giá sản phẩm này chưa
@@ -181,34 +182,50 @@ exports.rate = async (req, res) => {
   // xử lý khi chưa đánh giá trước đó
   let resDB = {};
   if (!isRated) {
+    // update avg
     const updateRatingAvg =
       product.rating_avg +
       (body.star - product.rating_avg) / (product.ratings.length + 1);
-    resDB = await Product.findByIdAndUpdate(
-      params.id,
-      {
-        rating_avg: updateRatingAvg,
-        $push: {
-          ratings: {
-            user_id: user._id,
-            star: body.star,
-          },
+    // update ratings
+    const contentUpdate = {
+      rating_avg: updateRatingAvg,
+      $push: {
+        ratings: {
+          user_id: user._id,
+          star: body.star,
         },
       },
-      { new: true }
-    );
+    };
+    if (body.comment)
+      contentUpdate.$push.comments = {
+        user_id: user._id,
+        content: body.comment,
+      };
+    console.log(contentUpdate);
+    resDB = await Product.findByIdAndUpdate(params.id, contentUpdate, {
+      new: true,
+    });
   }
   // xử lý khi đã đánh giá rồi
   else {
     const ratingAvg = product.rating_avg || 0;
     const updateRatingAvg =
       ratingAvg + (body.star - isRated.star) / product.ratings.length;
-    resDB = await Product.updateOne(
-      { ratings: isRated },
+    //
+    const contentUpdate = {
       // $ trỏ đến elment được tìm thấy trong mảng ratings thỏa  điều kiện isRated
-      { $set: { 'ratings.$.star': body.star, rating_avg: updateRatingAvg } },
-      { new: true }
-    );
+      $set: { 'ratings.$.star': body.star, rating_avg: updateRatingAvg },
+    };
+    if (body.comment)
+      contentUpdate.$push = {
+        comments: {
+          user_id: user._id,
+          content: body.comment,
+        },
+      };
+    resDB = await Product.updateOne({ ratings: isRated }, contentUpdate, {
+      new: true,
+    });
   }
 
   return res.status(200).json({

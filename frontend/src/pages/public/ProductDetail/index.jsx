@@ -9,12 +9,13 @@ import userApi from "../../../apis/user";
 import { getCurrent } from "../../../app/user/asyncActions";
 import Button from "../../../components/Button";
 import icons from "../../../icons";
-import { splitPrice } from "../../../utils";
+import { showStar, splitPrice } from "../../../utils/helpers";
 import VoteBar from "./VoteBar";
+import VoteOptions from "./VoteOptions";
 
 const ProductDetail = () => {
   const [product, setProduct] = React.useState({});
-  console.log(product);
+  const [isModalVote, setIsModalVote] = React.useState(false);
   //
   const dispatch = useDispatch();
   const params = useParams();
@@ -49,6 +50,10 @@ const ProductDetail = () => {
   const breadcrumbs = useBreadcrumbs(routes);
 
   // function
+  const toggleVote = React.useCallback(() => {
+    setIsModalVote(!isModalVote);
+  }, [isModalVote]);
+
   const handleAddCart = async (id) => {
     await userApi
       .updateCart({ productId: id })
@@ -79,6 +84,15 @@ const ProductDetail = () => {
   }, [params]);
   return (
     <div className="mt-2 w-[1200px] bg-white p-4">
+      {/* modal */}
+      {isModalVote && (
+        <div
+          onClick={() => setIsModalVote(!isModalVote)}
+          className="fixed inset-0 z-9999  flex items-center justify-center bg-[rgba(0,0,0,.5)]"
+        >
+          <VoteOptions id={product._id} setIsModalVote={setIsModalVote} />
+        </div>
+      )}
       {/* Breadcrumbs */}
       <div className="flex">
         {breadcrumbs
@@ -152,9 +166,21 @@ const ProductDetail = () => {
         </div>
       </div>
       {/* review */}
-      <div className="w-full border">
-        <div className="flex">
-          <div className="w-4/12"></div>
+      <div className="w-full ">
+        <div className="flex border">
+          <div className="ic flex w-4/12 items-center justify-center">
+            <div className="flex flex-col items-center gap-2 ">
+              <div className="text-lg font-bold">4.9/5</div>
+              <div className="flex">
+                {showStar(4).map((el, index) => (
+                  <el.icon key={index} className="text-xl text-orange-600" />
+                ))}
+              </div>
+              <div>
+                <span className="font-bold">18</span> lượt đánh giá và nhận xét
+              </div>
+            </div>
+          </div>
           <div className="w-8/12 border-l p-2">
             {Array.from(Array(5).keys())
               .reverse()
@@ -162,6 +188,11 @@ const ProductDetail = () => {
                 <VoteBar key={el} number={el + 1} count={1} total={5} />
               ))}
           </div>
+        </div>
+        <div className="mt-2 flex justify-center">
+          <Button primary onClick={() => toggleVote()}>
+            Đánh giá ngay
+          </Button>
         </div>
       </div>
     </div>

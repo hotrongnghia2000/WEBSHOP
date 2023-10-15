@@ -33,6 +33,10 @@ const productApi = {
     const url = `product/filter`;
     return axiosClient.get(url, { params });
   },
+  rate(body, id) {
+    const url = `product/rate/${id}`;
+    return axiosClient.patch(url, body);
+  },
 };
 
 export default productApi;

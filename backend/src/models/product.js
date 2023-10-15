@@ -78,7 +78,6 @@ var schema = new mongoose.Schema(
     comments: [
       {
         user_id: { type: mongoose.Types.ObjectId, ref: 'User' },
-        userName: { type: String },
         content: { type: String },
         parent_id: { type: mongoose.Types.ObjectId, default: null },
       },

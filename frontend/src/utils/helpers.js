@@ -1,3 +1,4 @@
+import icons from "../icons";
 export const splitPrice = (price) => {
   return Number(Math.round(price)).toLocaleString().split(",").join(".");
 };
@@ -37,4 +38,29 @@ export const paginationArr = (totalItem, current, sibling = 1) => {
     const middleRange = createArr(siblingLeft, siblingRight);
     return [1, "DOTS", ...middleRange, "DOTS", paginations];
   }
+};
+
+export const showStar = (numberStar) => {
+  const stars = [];
+  for (let i = 0; i < numberStar; i++) {
+    stars.push({
+      icon: icons.IconStar,
+    });
+  }
+  for (let i = 5; i > numberStar; i--) {
+    stars.push({
+      icon: icons.IconEmptyStar,
+    });
+  }
+  return stars;
+};
+
+export const updateOjectArray = (arr, id, newObject) => {
+  var index = arr.findIndex((x) => x.id === id);
+  if (index !== -1)
+    return [
+      ...arr.slice(0, index),
+      { ...arr[index], ...newObject },
+      ...arr.slice(index + 1),
+    ];
 };

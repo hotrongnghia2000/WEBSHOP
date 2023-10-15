@@ -13,7 +13,7 @@ import productApi from "../../../apis/product";
 import userApi from "../../../apis/user";
 import { getCurrent } from "../../../app/user/asyncActions";
 import icons from "../../../icons";
-import { paginationArr, splitPrice } from "../../../utils";
+import { paginationArr, splitPrice } from "../../../utils/helpers";
 import Filter from "./Filter";
 
 const Home = () => {

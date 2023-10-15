@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import productApi from "../../../apis/product";
 import useDebounce from "../../../hooks/useDebounce";
 import icons from "../../../icons";
-import * as ultils from "../../../utils";
+import * as ultils from "../../../utils/helpers";
 
 const SearchProduct = () => {
   const [results, setResults] = React.useState([]);
