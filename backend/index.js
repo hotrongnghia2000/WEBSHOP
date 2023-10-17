@@ -41,17 +41,10 @@ const app = express();
 // cors là middleware kích hoạt cors cho mọi request được gửi lên
 // có thể tùy biến đa dạng, đây là cơ bản
 const corsOptions = {
-  origin: [process.env.URL_CLIENT],
+  origin: process.env.URL_CLIENT,
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.all('*', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
 
 app.use(cookieParser());
 
@@ -64,6 +57,13 @@ app.use(express.urlencoded({ extended: true }));
 // route sẽ được tạo thông qua use.methods
 // viết một hàm tạo router ở folder và require vào đây dùng cho gọn
 initRouters(app);
+app.all('*', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
 // HANDLE ERROR
 app.use(handleError);
