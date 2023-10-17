@@ -10,7 +10,7 @@ import EditCategory from "../pages/private/EditCategory";
 import EditProduct from "../pages/private/EditProduct";
 import Orders from "../pages/private/Orders";
 import Products from "../pages/private/Products";
-import HandleRole from "./handleRole";
+import HandleRole from "./HandleRole";
 
 export let privateRouter = [
   // mỗi route sẽ có 2 thành phần chính là PATH và ELEMENT
