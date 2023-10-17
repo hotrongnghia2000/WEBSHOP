@@ -41,6 +41,7 @@ const app = express();
 // cors là middleware kích hoạt cors cho mọi request được gửi lên
 // có thể tùy biến đa dạng, đây là cơ bản
 app.use(cors());
+app.options('*', cors());
 
 app.use(cookieParser());
 
