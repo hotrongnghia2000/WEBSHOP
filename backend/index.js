@@ -40,7 +40,11 @@ const app = express();
 // vì vậy mà client http://localhost:8888 của vite không thể gọi api đến server http://localhost:8888
 // cors là middleware kích hoạt cors cho mọi request được gửi lên
 // có thể tùy biến đa dạng, đây là cơ bản
-app.use(cors());
+const corsOptions = {
+  origin: '---',
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*'); // '*' allows any origin, you can restrict it to specific origins
