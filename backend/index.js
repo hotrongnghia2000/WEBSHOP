@@ -46,16 +46,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*'); // '*' allows any origin, you can restrict it to specific origins
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-  );
-  next();
-});
-
 app.use(cookieParser());
 
 // yêu cầu server chấp nhận json
@@ -67,6 +57,13 @@ app.use(express.urlencoded({ extended: true }));
 // route sẽ được tạo thông qua use.methods
 // viết một hàm tạo router ở folder và require vào đây dùng cho gọn
 initRouters(app);
+app.all('*', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
 // HANDLE ERROR
 app.use(handleError);
