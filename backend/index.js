@@ -41,7 +41,16 @@ const app = express();
 // cors là middleware kích hoạt cors cho mọi request được gửi lên
 // có thể tùy biến đa dạng, đây là cơ bản
 app.use(cors());
-app.options('*', cors());
+
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*'); // '*' allows any origin, you can restrict it to specific origins
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  next();
+});
 
 app.use(cookieParser());
 
