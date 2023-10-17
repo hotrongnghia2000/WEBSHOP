@@ -41,7 +41,7 @@ const app = express();
 // cors là middleware kích hoạt cors cho mọi request được gửi lên
 // có thể tùy biến đa dạng, đây là cơ bản
 const corsOptions = {
-  origin: process.env.URL_CLIENT,
+  origin: [process.env.URL_CLIENT],
   credentials: true,
 };
 app.use(cors(corsOptions));
