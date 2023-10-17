@@ -8,7 +8,7 @@ const VoteBar = (props) => {
     percentRef.current.style.cssText = `width: ${Math.round(
       (props.count * 100) / props.total,
     )}%`;
-  }, [props.total]);
+  }, [props.total, props.ratingAvg]);
   return (
     <div className="my-2 flex items-center gap-2 px-2">
       <div className="flex w-[50px] items-center gap-1 text-sm">
@@ -24,7 +24,7 @@ const VoteBar = (props) => {
           ></div>
         </div>
       </div>
-      <div className="w-[100px] text-sm">1 reviewers</div>
+      <div className="w-[100px] text-sm">{props.count} reviewers</div>
     </div>
   );
 };

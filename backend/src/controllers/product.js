@@ -40,6 +40,7 @@ exports.getOne = async (req, res) => {
   // populate sẽ tham chiếu thuộc tính nằm trong table Category, và đó là thuộc tính categories
   const params = req.params;
   const resDB = await Product.findById(params.id)
+    .populate('comments.user_id', '-password -refreshToken -role')
     .populate('brand_id')
     .populate('category_id');
   return res.status(200).json({

@@ -11,43 +11,65 @@ import {
 import Swal from "sweetalert2";
 import productApi from "../../../apis/product";
 import userApi from "../../../apis/user";
-import { getCurrent } from "../../../app/user/asyncActions";
+import { getCurrent, refreshToken } from "../../../app/user/asyncActions";
 import icons from "../../../icons";
-import { paginationArr, splitPrice } from "../../../utils/helpers";
+import {
+  checkTokenIsExpire,
+  delay,
+  paginationArr,
+  showStar,
+  splitPrice,
+} from "../../../utils/helpers";
 import Filter from "./Filter";
 
 const Home = () => {
   const [params] = useSearchParams();
   const { category } = useParams();
   const [products, setProducts] = React.useState([]);
-  console.log(products);
+  // thêm biến này vì sau khi dispatch login thì redux persit không ghi kịp current vào localstorage
 
   const user = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [arr, setArr] = React.useState([]);
   const [queries, setQueries] = React.useState({ page: 1 });
   // function
   const handleAddCart = async (id) => {
-    await userApi
-      .updateCart({ productId: id })
-      .then((res) => {
-        dispatch(getCurrent());
-        console.log(res);
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "SUCCESS",
-          html: `Đã thêm 1 sản phẩm vào giỏ hàng!`,
+    //
+    if (user.isLogged) {
+      if (checkTokenIsExpire(user.token)) {
+        dispatch(refreshToken());
+        await delay(100);
+      }
+      // chờ đợi dữ liệu ghi vào localstorage từ redux persist bằng setTimeout 100ms
+
+      await userApi
+        .updateCart({ productId: id })
+        .then((res) => {
+          dispatch(getCurrent());
+          console.log(res);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "SUCCESS",
+            html: `Đã thêm 1 sản phẩm vào giỏ hàng!`,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
+    } else {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "Bạn chưa đăng nhập",
+        html: "Bạn vui lòng đăng nhập để tạo giỏ hàng!",
       });
+    }
   };
 
   //
-
   React.useEffect(() => {
     let param = [];
     for (let i of params.entries()) param.push(i);
@@ -62,7 +84,6 @@ const Home = () => {
         .filter(paramQueries)
         .then((res) => {
           const data = res.data.data;
-          console.log(res);
           setProducts(data);
           setArr(paginationArr(res.data.count, 1));
         })
@@ -121,28 +142,59 @@ const Home = () => {
                     </div>
                   ))}
                 </div>
+                {/* show star */}
+                {el.rating_avg > 0 && (
+                  <div className="mt-4 flex justify-center">
+                    {showStar(el.rating_avg).map((el, index) => (
+                      <el.icon
+                        key={index}
+                        className="text-xl text-orange-600"
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/*  */}
                 {/* action */}
-                <div className="mt-4 flex h-[40px] justify-around">
-                  {user?.current.cart.some((elCart) => {
-                    return elCart.product._id === el._id.toString();
-                  }) ? (
-                    <button
-                      className={clsx(
-                        "cursor-not-allowed rounded-md px-4 py-2 hover:bg-whiten",
-                      )}
-                      type="button"
-                    >
-                      <icons.IconCartCheckFill className="text-lg text-orange-600" />
-                    </button>
-                  ) : (
-                    <button
-                      className={clsx("rounded-md px-4 py-2 hover:bg-whiten")}
-                      type="button"
-                      onClick={() => handleAddCart(el._id)}
-                    >
-                      <icons.IconBxsCartAdd className="text-2xl" />
-                    </button>
-                  )}
+                <div className="mt-2 flex h-[40px] justify-around">
+                  {(() => {
+                    if (user.current) {
+                      return user.current.cart?.some((elCart) => {
+                        return elCart.product._id === el._id.toString();
+                      }) ? (
+                        <button
+                          className={clsx(
+                            "cursor-not-allowed rounded-md px-4 py-2 hover:bg-whiten",
+                          )}
+                          type="button"
+                        >
+                          <icons.IconCartCheckFill className="text-lg text-orange-600" />
+                        </button>
+                      ) : (
+                        <button
+                          className={clsx(
+                            "rounded-md px-4 py-2 hover:bg-whiten",
+                          )}
+                          type="button"
+                          onClick={() => handleAddCart(el._id)}
+                        >
+                          <icons.IconBxsCartAdd className="text-2xl" />
+                        </button>
+                      );
+                    } else {
+                      return (
+                        <button
+                          className={clsx(
+                            "rounded-md px-4 py-2 hover:bg-whiten",
+                          )}
+                          type="button"
+                          onClick={() => handleAddCart(el._id)}
+                        >
+                          <icons.IconBxsCartAdd className="text-2xl" />
+                        </button>
+                      );
+                    }
+                  })()}
                 </div>
               </div>
             </div>

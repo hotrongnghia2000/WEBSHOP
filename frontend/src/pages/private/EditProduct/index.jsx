@@ -40,7 +40,7 @@ function EditProduct() {
   } = useForm({
     mode: "onSubmit",
     resolver: yupResolver(productSchema.edit),
-    defaultValues: {},
+    defaultValues: { price },
   });
   // console.log(getFieldState("brand_id"));
   // useFieldArrays
@@ -50,13 +50,15 @@ function EditProduct() {
   });
   // submit
   const onSubmit = async (data) => {
-    Swal.fire({
-      title: "Đang xử lý",
-      html: "Vui lòng chờ trong giây lát!",
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    for (const key in data)
+      Swal.fire({
+        title: "Đang xử lý",
+        html: "Vui lòng chờ trong giây lát!",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
     const formData = new FormData();
     if (getFieldState("images").isDirty) {
       for (const el of data.images) {
@@ -69,9 +71,12 @@ function EditProduct() {
       }
     }
     if (data.desc) formData.append("desc", JSON.stringify(data.desc));
+    delete data.ratings;
+    delete data.comments;
     delete data.thumb;
     delete data.images;
     delete data.desc;
+    console.log(data);
     for (const key in data) {
       formData.append(key, data[key]);
     }
@@ -79,7 +84,6 @@ function EditProduct() {
       const data = res.data.data;
       setDesc(data.desc);
       setImages(data.images);
-      console.log(res);
       Swal.close();
       Swal.fire({
         position: "center",

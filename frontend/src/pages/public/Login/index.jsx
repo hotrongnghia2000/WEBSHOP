@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import userApi from "../../../apis/user";
 import * as userApp from "../../../app/user";
+import { getCurrent } from "../../../app/user/asyncActions";
 import Button from "../../../components/Button";
 import InputField from "../../../components/InputField";
 import icons from "../../../icons";
@@ -22,23 +23,27 @@ const Login = () => {
   } = useForm({ mode: "onBlur", resolver: yupResolver(userSchema.login) });
   const onSubmit = async (body) => {
     // userApi.login(body) tạo ra một promise, do đó có thể dùng then và catch
-    const rs = await userApi
+    await userApi
       .login(body)
-      .then((res) => {
+      .then(async (res) => {
         const data = res.data.data;
+        console.log(data);
         dispatch(
           userApp.login({
             isLogged: res.status === 200,
-            current: res.data.data,
             token: res.data.accessToken,
           }),
         );
-        navigate("/home");
+        navigate("/");
         Swal.fire({
           position: "center",
           icon: "success",
           title: "SUCCESS",
           html: res.data.message,
+          willClose: () => {
+            // dùng để fix khi getcurrent lần đầu tiên, state.current không kịp lưu vào localstorage
+            dispatch(getCurrent());
+          },
         });
       })
       .catch((err) => {
@@ -52,7 +57,6 @@ const Login = () => {
           confirmButtonText: "Xác nhận",
         });
       });
-    console.log(rs);
   };
 
   return (

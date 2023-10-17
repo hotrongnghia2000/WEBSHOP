@@ -37,6 +37,10 @@ const userApi = {
     const url = `user/getCurrent`;
     return axiosClient.get(url);
   },
+  refreshToken() {
+    const url = `user/refreshToken`;
+    return axiosClient.get(url, { withCredentials: true });
+  },
 };
 
 export default userApi;

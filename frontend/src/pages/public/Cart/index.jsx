@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import userApi from "../../../apis/user";
-import { getCurrent } from "../../../app/user/asyncActions";
+import { getCurrent, refreshToken } from "../../../app/user/asyncActions";
 import Button from "../../../components/Button";
 import icons from "../../../icons";
-import { splitPrice } from "../../../utils/helpers";
+import { checkTokenIsExpire, delay, splitPrice } from "../../../utils/helpers";
 
 function Cart() {
   //
@@ -29,24 +29,40 @@ function Cart() {
   };
 
   const delAllCart = async () => {
-    await userApi
-      .delCart()
-      .then((res) => dispatch(getCurrent()))
-      .catch((err) => {
-        console.log(err);
-      });
+    if (user.isLogged) {
+      if (checkTokenIsExpire(user.token)) {
+        dispatch(refreshToken());
+        await delay(100);
+      }
+      // chờ đợi dữ liệu ghi vào localstorage từ redux persist bằng setTimeout 100ms
+
+      await userApi
+        .delCart()
+        .then((res) => dispatch(getCurrent()))
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   const delCart = async (id) => {
-    await userApi
-      .delCart({ id })
-      .then((res) => dispatch(getCurrent()))
-      .catch((err) => {
-        console.log(err);
-      });
+    if (user.isLogged) {
+      if (checkTokenIsExpire(user.token)) {
+        dispatch(refreshToken());
+        // chờ đợi dữ liệu ghi vào localstorage từ redux persist bằng setTimeout 100ms
+        await delay(100);
+      }
+
+      await userApi
+        .delCart({ id })
+        .then((res) => dispatch(getCurrent()))
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
-  // effect
+  React.effect;
   React.useEffect(() => {
     if (user.current.cart.length === 0)
       Swal.fire({

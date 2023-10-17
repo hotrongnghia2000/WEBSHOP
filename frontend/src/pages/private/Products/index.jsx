@@ -168,7 +168,7 @@ function Brands() {
   }, [checks]);
   return (
     <div>
-      <Breadcrumb pageName="Brands" />
+      <Breadcrumb pageName="Products" />
       {/* main */}
       <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
         {/* Add */}

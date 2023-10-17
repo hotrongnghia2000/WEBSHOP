@@ -1,3 +1,4 @@
+import jwt_decode from "jwt-decode";
 import icons from "../icons";
 export const splitPrice = (price) => {
   return Number(Math.round(price)).toLocaleString().split(",").join(".");
@@ -64,3 +65,13 @@ export const updateOjectArray = (arr, id, newObject) => {
       ...arr.slice(index + 1),
     ];
 };
+
+export const checkTokenIsExpire = (token) => {
+  const decoded = jwt_decode(token);
+  if (decoded.exp * 1000 < Date.now()) {
+    return true;
+  }
+  return false;
+};
+
+export const delay = (ms) => new Promise((res) => setTimeout(res, ms));

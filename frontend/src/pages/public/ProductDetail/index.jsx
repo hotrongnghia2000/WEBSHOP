@@ -1,15 +1,20 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useParams } from "react-router-dom";
 import Slider from "react-slick";
 import Swal from "sweetalert2";
 import useBreadcrumbs from "use-react-router-breadcrumbs";
 import productApi from "../../../apis/product";
 import userApi from "../../../apis/user";
-import { getCurrent } from "../../../app/user/asyncActions";
+import { getCurrent, refreshToken } from "../../../app/user/asyncActions";
 import Button from "../../../components/Button";
 import icons from "../../../icons";
-import { showStar, splitPrice } from "../../../utils/helpers";
+import {
+  checkTokenIsExpire,
+  delay,
+  showStar,
+  splitPrice,
+} from "../../../utils/helpers";
 import VoteBar from "./VoteBar";
 import VoteOptions from "./VoteOptions";
 
@@ -17,6 +22,7 @@ const ProductDetail = () => {
   const [product, setProduct] = React.useState({});
   const [isModalVote, setIsModalVote] = React.useState(false);
   //
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const params = useParams();
   //
@@ -51,25 +57,49 @@ const ProductDetail = () => {
 
   // function
   const toggleVote = React.useCallback(() => {
-    setIsModalVote(!isModalVote);
+    if (user.isLogged) setIsModalVote(!isModalVote);
+    else {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "Bạn chưa đăng nhập",
+        html: "Bạn vui lòng đăng nhập để đánh giá sản phẩm!",
+      });
+    }
   }, [isModalVote]);
 
   const handleAddCart = async (id) => {
-    await userApi
-      .updateCart({ productId: id })
-      .then((res) => {
-        dispatch(getCurrent());
-        console.log(res);
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "SUCCESS",
-          html: `Đã thêm 1 sản phẩm vào giỏ hàng!`,
+    if (user.isLogged) {
+      if (checkTokenIsExpire(user.token)) {
+        dispatch(refreshToken());
+        await delay(100);
+      }
+      // chờ đợi dữ liệu ghi vào localstorage từ redux persist bằng setTimeout 100ms
+
+      await userApi
+        .updateCart({ productId: id })
+        .then((res) => {
+          dispatch(getCurrent());
+          console.log(res);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "SUCCESS",
+            html: `Đã thêm 1 sản phẩm vào giỏ hàng!`,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
+    } else {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "Bạn chưa đăng nhập",
+        html: "Bạn vui lòng đăng nhập để tạo giỏ hàng!",
       });
+    }
+    //
   };
   //
   React.useEffect(() => {
@@ -90,7 +120,11 @@ const ProductDetail = () => {
           onClick={() => setIsModalVote(!isModalVote)}
           className="fixed inset-0 z-9999  flex items-center justify-center bg-[rgba(0,0,0,.5)]"
         >
-          <VoteOptions id={product._id} setIsModalVote={setIsModalVote} />
+          <VoteOptions
+            id={product._id}
+            setIsModalVote={setIsModalVote}
+            setProduct={setProduct}
+          />
         </div>
       )}
       {/* Breadcrumbs */}
@@ -170,29 +204,83 @@ const ProductDetail = () => {
         <div className="flex border">
           <div className="ic flex w-4/12 items-center justify-center">
             <div className="flex flex-col items-center gap-2 ">
-              <div className="text-lg font-bold">4.9/5</div>
+              <div className="text-lg font-bold">{product.rating_avg}/5</div>
               <div className="flex">
-                {showStar(4).map((el, index) => (
+                {showStar(product?.rating_avg).map((el, index) => (
                   <el.icon key={index} className="text-xl text-orange-600" />
                 ))}
               </div>
               <div>
-                <span className="font-bold">18</span> lượt đánh giá và nhận xét
+                <span className="font-bold">{product?.ratings?.length}</span>{" "}
+                lượt đánh giá và nhận xét
               </div>
             </div>
           </div>
           <div className="w-8/12 border-l p-2">
             {Array.from(Array(5).keys())
               .reverse()
-              .map((el, index) => (
-                <VoteBar key={el} number={el + 1} count={1} total={5} />
-              ))}
+              .map((el, index) => {
+                const count = product?.ratings?.filter(
+                  (elRating) => elRating.star === el + 1,
+                ).length;
+                return (
+                  <VoteBar
+                    key={el}
+                    number={el + 1}
+                    count={count}
+                    total={product?.ratings?.length}
+                    ratingAvg={product?.rating_avg}
+                  />
+                );
+              })}
           </div>
         </div>
         <div className="mt-2 flex justify-center">
-          <Button primary onClick={() => toggleVote()}>
+          <Button type="button" primary onClick={() => toggleVote()}>
             Đánh giá ngay
           </Button>
+        </div>
+        {/* show comment */}
+        <div className="mt-12 flex flex-col gap-4 border-t">
+          {!product?.comments?.length && (
+            <div className="flex justify-center font-bold">
+              <div className="text-center">
+                <p>Chưa có có comment nào!</p>
+                <p>Bạn hãy là người comment đầu tiên!</p>
+              </div>
+            </div>
+          )}
+          {product?.comments?.map((el, index) => {
+            return (
+              <div key={index} className="mt-2 flex gap-4 ">
+                <div>
+                  <div className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 p-4 capitalize">
+                    {el.user_id.email.split("@")[0].charAt(0)}
+                  </div>
+                </div>
+                {/* show star user comment đã đánh giá cho sản phẩm */}
+                <div>
+                  <div className="mt-1">{el.user_id.email.split("@")[0]}</div>
+                  <div className="flex">
+                    {showStar(
+                      product?.ratings.find(
+                        (elRating) => elRating.user_id === el.user_id._id,
+                      ).star,
+                    ).map((el, index) => (
+                      <el.icon
+                        key={index}
+                        className="text-xl text-orange-600"
+                      />
+                    ))}
+                  </div>
+                  {/* content comment */}
+                  <div className="mt-2">
+                    <p className="text-sm">{el.content}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

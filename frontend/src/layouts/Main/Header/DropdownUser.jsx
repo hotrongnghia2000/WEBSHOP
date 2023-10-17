@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -13,6 +13,7 @@ const DropdownUser = () => {
   const dropdown = useRef(null);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+
   // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
@@ -41,7 +42,7 @@ const DropdownUser = () => {
 
   return (
     <div className="relative">
-      <Link to="/login" className={clsx({ hidden: user.current })}>
+      <Link to="/login" className={clsx({ hidden: user.isLogged })}>
         <div className="ml-2 flex cursor-pointer items-center gap-x-1 rounded-md border px-4 py-2 hover:bg-gray-100">
           <span className="text-sm font-medium">Sign in</span>
         </div>
@@ -49,13 +50,13 @@ const DropdownUser = () => {
       <Link
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className={clsx("flex items-center gap-4", { hidden: !user.current })}
+        className={clsx("flex items-center gap-4", { hidden: !user.isLogged })}
         to="#"
       >
         <div className="ml-2 flex cursor-pointer items-center gap-x-1 rounded-md border px-2 py-1 hover:bg-gray-100">
           <icons.IconAccountCircleOutline className="text-2xl" />
           <span className="hidden text-sm font-medium md:block">
-            Hi, {user.current?.email?.split("@")[0]}
+            Hi, {user?.current?.email?.split("@")[0]}
           </span>
 
           <svg
@@ -165,6 +166,7 @@ const DropdownUser = () => {
           onClick={() => {
             dispatch(logout());
             setDropdownOpen(false);
+
             Swal.fire({
               position: "center",
               icon: "success",

@@ -52,7 +52,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     >
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink to="/">
-          <h3 className="p-4 text-white">Welcome Admin</h3>
+          <h3 className="p-4 text-white">Test Front-End</h3>
         </NavLink>
         <button
           ref={trigger}

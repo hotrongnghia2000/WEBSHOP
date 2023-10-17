@@ -135,21 +135,17 @@ exports.login = async (req, res) => {
 
   // tạo RT, update DB và lưu vào cookie của user
   const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
-    expiresIn: '7d',
+    expiresIn: '120s',
   });
-  const resDB = await User.findByIdAndUpdate(
-    user._id,
-    { refreshToken },
-    { new: true }
-  );
+  await User.findByIdAndUpdate(user._id, { refreshToken }, { new: true });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 120 * 1000,
   });
 
   // tạo AT
   const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
-    expiresIn: 7 * 24 * 60 * 60 * 1000,
+    expiresIn: '5s',
   });
 
   // loại bỏ password trước khi trả user data về client
@@ -185,7 +181,7 @@ exports.refreshToken = async (req, res) => {
 
   // tạo AT mới
   const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
-    expiresIn: 5 * 60,
+    expiresIn: '10s',
   });
 
   return res.status(200).json({

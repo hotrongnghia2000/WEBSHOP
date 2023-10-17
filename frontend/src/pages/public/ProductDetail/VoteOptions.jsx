@@ -2,16 +2,24 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import clsx from "clsx";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import productApi from "../../../apis/product";
+import { refreshToken } from "../../../app/user/asyncActions";
 import Button from "../../../components/Button";
 import TextAreaField from "../../../components/TextAreaField";
 import icons from "../../../icons";
 import * as contants from "../../../utils/constants";
-import { updateOjectArray } from "../../../utils/helpers";
+import {
+  checkTokenIsExpire,
+  delay,
+  updateOjectArray,
+} from "../../../utils/helpers";
 import * as productSchema from "../../../validators/product";
 
 const VoteOptions = (props) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const [voteList, setVoteList] = React.useState(contants.voteOptions);
   const {
     register,
@@ -24,22 +32,34 @@ const VoteOptions = (props) => {
     resolver: yupResolver(productSchema.rate),
   });
   const onSubmit = async (data) => {
-    console.log(data);
-    await productApi
-      .rate(data, props.id)
-      .then((res) => {
-        console.log(res);
-        props.setIsModalVote((prev) => !prev);
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "SUCCESS",
-          html: "<p>Cám ơn bạn đã đánh giá sản phẩm!!!<p/>",
-          showConfirmButton: true,
-          confirmButtonText: "Xác nhận",
-        });
-      })
-      .catch((err) => console.log(err));
+    if (user.isLogged) {
+      if (checkTokenIsExpire(user.token)) {
+        dispatch(refreshToken());
+        // chờ đợi dữ liệu ghi vào localstorage từ redux persist bằng setTimeout 100ms
+        await delay(100);
+      }
+
+      await productApi
+        .rate(data, props.id)
+        .then(async (res) => {
+          props.setIsModalVote((prev) => !prev);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "SUCCESS",
+            html: "<p>Cám ơn bạn đã đánh giá sản phẩm!!!<p/>",
+            showConfirmButton: true,
+            confirmButtonText: "Xác nhận",
+          });
+        })
+        .then(async (res) => {
+          await productApi.getOne(props.id).then((res) => {
+            props.setProduct(res.data.data);
+          });
+        })
+        .catch((err) => console.log(err));
+    }
+    //
   };
 
   return (
