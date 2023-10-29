@@ -16,5 +16,4 @@ const Breadcrumb = ({ pageName }) => {
     </div>
   );
 };
-
 export default Breadcrumb;

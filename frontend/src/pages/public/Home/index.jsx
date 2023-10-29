@@ -107,9 +107,9 @@ const Home = () => {
         <span className="cursor-pointer rounded-sm px-2 py-1 text-sm font-medium hover:bg-gray-100"></span>
       </div>
       {/* list products */}
-      <ul className="mx-[-10px] mt-8 flex flex-wrap">
+      <ul className="mx-[-20px] mt-8 flex flex-wrap">
         {products.map((el, index) => (
-          <li key={index} className="  mb-6 w-1/2 px-[10px] md:w-1/3 lg:w-1/4">
+          <li key={index} className="  mb-6 w-1/2 px-[20px] md:w-1/3 lg:w-1/4">
             <div className="flex h-full flex-col justify-between rounded-md border bg-white p-[20px_10px_20px] drop-shadow">
               <Link
                 to={`/${el.category_id.name.toLowerCase()}/${el._id}/${

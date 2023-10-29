@@ -141,7 +141,6 @@ exports.filter = async (req, res) => {
     myFilter.name = { $regex: query.name, $options: 'i' };
   }
   if (!myFilter) myFilter = null;
-  console.log(myFilter);
   // 2. SORT
   const mySorter = query.sort?.split(',').join(' ') || '-createdAt';
 
